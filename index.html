@@ -1,104 +1,274 @@
 <!DOCTYPE html>
-<html lang="so">
+<html lang="so" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Somali National Border AI Inspection System</title>
+  <title>Somali National Border & Port AI Quality Control Engine</title>
+  
+  <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              500: '#10b981',
+              600: '#059669',
+              900: '#064e3b',
+              950: '#022c22',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glow-emerald {
+      box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.25);
+    }
+    .glow-red {
+      box-shadow: 0 0 25px -5px rgba(239, 68, 68, 0.25);
+    }
+  </style>
 </head>
-<body class="bg-gray-950 text-white min-h-screen">
+<body class="bg-[#07090e] text-slate-100 min-h-screen selection:bg-emerald-500 selection:text-black pb-12">
+
+  <!-- Top Announcement / System Status Bar -->
+  <div class="bg-emerald-950/80 border-b border-emerald-800/40 px-4 py-1.5 text-xs font-mono text-emerald-400 flex items-center justify-between">
+    <div class="flex items-center gap-2 max-w-7xl mx-auto w-full">
+      <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span>SYSTEM STATUS: <strong class="text-white">ONLINE</strong> | AI VISION ENGINE v3.4 READY | BORDER PORTS SYNCED</span>
+    </div>
+  </div>
 
   <!-- Header Section -->
-  <header class="border-b border-gray-800 bg-gray-900/50 p-4">
-    <div class="max-w-6xl mx-auto flex justify-between items-center">
-      <h1 class="text-xl font-bold text-emerald-400 flex items-center gap-2">
-        🛡️ BORDER GUARD AI <span class="text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded">v1.0 Enterprise</span>
-      </h1>
-      <span class="text-xs text-gray-400">Quality Control & Anti-Counterfeit Engine</span>
+  <header class="border-b border-slate-800/80 glass-panel sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400">
+          <i data-lucide="shield-check" class="w-7 h-7"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-extrabold tracking-tight text-white">NATIONAL BORDER CONTROL</h1>
+            <span class="bg-emerald-500/10 text-emerald-400 text-[10px] font-mono px-2 py-0.5 rounded border border-emerald-500/20">NATIONAL SECURITY AI</span>
+          </div>
+          <p class="text-xs text-slate-400">Automated Quality Control, Expiry Detection & Chemical Risk Assessment System</p>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Counters -->
+      <div class="flex items-center gap-4 text-xs font-mono">
+        <div class="bg-slate-900/80 border border-slate-800 px-3 py-1.5 rounded-lg">
+          <span class="text-slate-400 block text-[10px]">TOTAL SCANS</span>
+          <span id="counterTotal" class="text-sm font-bold text-white">0</span>
+        </div>
+        <div class="bg-emerald-950/40 border border-emerald-800/40 px-3 py-1.5 rounded-lg">
+          <span class="text-emerald-400 block text-[10px]">PASSED</span>
+          <span id="counterPassed" class="text-sm font-bold text-emerald-300">0</span>
+        </div>
+        <div class="bg-red-950/40 border border-red-800/40 px-3 py-1.5 rounded-lg">
+          <span class="text-red-400 block text-[10px]">SEIZED / REJECTED</span>
+          <span id="counterRejected" class="text-sm font-bold text-red-400">0</span>
+        </div>
+      </div>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto p-4 md:p-8 space-y-6">
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
 
-    <!-- Upload & Scanner Controls -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Top Grid: Control Input & Real-time AI Inspection -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
       
-      <!-- Left: Input Card -->
-      <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 space-y-4">
-        <h2 class="text-lg font-bold text-gray-200">1. Baaritaanka Alaabta (New Inspection)</h2>
-        
-        <div>
-          <label class="block text-sm font-medium text-gray-400 mb-2">Soo Upload-geree Sawirka Baakadda/Barcode-ka:</label>
-          <input type="file" id="imageInput" accept="image/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500 cursor-pointer">
-        </div>
+      <!-- Left Column: Input Form (5 Cols) -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="scan" class="w-5 h-5 text-emerald-400"></i>
+              1. Inspection Scan Setup
+            </h2>
+            <span class="text-[11px] font-mono text-slate-400">PORT ENGINE v1</span>
+          </div>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-400 mb-1">Dekedda / Xudduudda (Port Location):</label>
-          <select id="portLocation" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-emerald-500">
-            <option value="Mogadishu Port">Mogadishu Port</option>
-            <option value="Berbera Port">Berbera Port</option>
-            <option value="Bosaso Port">Bosaso Port</option>
-            <option value="Kismayo Port">Kismayo Port</option>
-            <option value="Border Land Checkpoint">Border Land Checkpoint</option>
-          </select>
-        </div>
+          <!-- File Upload Dropzone -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Upload Product / Packaging Image</label>
+            <div id="dropzone" class="border-2 border-dashed border-slate-700 hover:border-emerald-500/60 transition-all rounded-xl p-6 text-center bg-slate-900/40 cursor-pointer group">
+              <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="previewImage(event)">
+              <div onclick="document.getElementById('imageInput').click()" class="space-y-3">
+                <div class="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mx-auto text-slate-400 group-hover:text-emerald-400 group-hover:bg-emerald-950/50 transition">
+                  <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-slate-200">Click to upload or drag & drop</p>
+                  <p class="text-xs text-slate-400 mt-1">Supports PNG, JPG, WEBP (Barcode/Expiry text visible)</p>
+                </div>
+              </div>
+            </div>
+            <!-- Image Preview Box -->
+            <div id="imagePreviewContainer" class="hidden mt-3 relative rounded-xl overflow-hidden border border-slate-700 max-h-48">
+              <img id="imagePreview" class="w-full object-cover max-h-48" alt="Preview">
+              <button onclick="clearImage()" class="absolute top-2 right-2 p-1.5 bg-black/70 hover:bg-red-600 rounded-full text-white transition">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
 
-        <button onclick="runInspectionAI()" id="scanBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-lg transition duration-200 flex items-center justify-center space-x-2">
-          <span>⚡ Falanqee Sawirka (Run AI Inspection)</span>
-        </button>
+          <!-- Port Location Select -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Border Inspection Checkpoint</label>
+            <select id="portLocation" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 font-medium">
+              <option value="Mogadishu International Port">Mogadishu Port (Sea Border)</option>
+              <option value="Berbera Deep Water Port">Berbera Port (Sea Border)</option>
+              <option value="Bosaso Commercial Port">Bosaso Port (Sea Border)</option>
+              <option value="Aden Adde Airport Air Cargo">Aden Adde International Airport (Air Border)</option>
+              <option value="Kismayo Seaport">Kismayo Port (Sea Border)</option>
+              <option value="Border Land Crossing Point">Land Border Crossing Point</option>
+            </select>
+          </div>
+
+          <!-- Inspector ID / Badge -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Officer Badge ID</label>
+            <input type="text" id="officerBadge" value="OFFICER-AI-88" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 font-mono focus:outline-none focus:border-emerald-500">
+          </div>
+
+          <!-- Run Button -->
+          <button onclick="runInspectionAI()" id="scanBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-extrabold py-3.5 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 glow-emerald">
+            <i data-lucide="cpu" class="w-5 h-5"></i>
+            <span>EXECUTE AI DEEP INSPECTION</span>
+          </button>
+
+        </div>
       </div>
 
-      <!-- Right: AI Live Result Display -->
-      <div id="resultContainer" class="bg-gray-900 border border-gray-800 rounded-xl p-6 hidden space-y-4">
-        <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-          <h2 class="text-lg font-bold">2. Warbixinta AI (Live Audit Result)</h2>
-          <span id="riskBadge" class="px-3 py-1 rounded-full text-xs font-bold"></span>
+      <!-- Right Column: AI Live Result Display (7 Cols) -->
+      <div class="lg:col-span-7 space-y-6">
+        
+        <!-- Placeholder Empty State -->
+        <div id="resultPlaceholder" class="glass-panel p-12 rounded-2xl border border-slate-800 text-center space-y-4 flex flex-col items-center justify-center min-h-[460px]">
+          <div class="w-16 h-16 bg-slate-800/80 rounded-2xl flex items-center justify-center text-slate-500 border border-slate-700">
+            <i data-lucide="binary" class="w-8 h-8"></i>
+          </div>
+          <div class="max-w-md space-y-1">
+            <h3 class="text-base font-bold text-white">Awaiting Product Analysis</h3>
+            <p class="text-xs text-slate-400">Upload a product image or package label on the left to run AI OCR, check expiration limits, and scan banned chemical databases.</p>
+          </div>
         </div>
 
-        <div class="space-y-3 text-sm">
-          <div>
-            <span class="text-gray-400">Magaca Alaabta:</span>
-            <p id="resProductName" class="text-base font-semibold text-white"></p>
-          </div>
-          <div class="grid grid-cols-2 gap-2">
+        <!-- Real Analysis Result Card -->
+        <div id="resultCard" class="hidden glass-panel p-6 rounded-2xl border border-slate-800 space-y-6">
+          
+          <div class="flex flex-wrap items-center justify-between border-b border-slate-800 pb-4 gap-3">
             <div>
-              <span class="text-gray-400">Taariikhda Expire-ka:</span>
-              <p id="resExpiry" class="font-medium text-white"></p>
+              <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest block">AI INSPECTION REPORT</span>
+              <h3 id="resProductName" class="text-xl font-extrabold text-white">---</h3>
             </div>
-            <div>
-              <span class="text-gray-400">Country of Origin:</span>
-              <p id="resOrigin" class="font-medium text-white"></p>
+            <div id="statusBadge" class="px-4 py-1.5 rounded-full text-xs font-mono font-bold flex items-center gap-2">
+              <!-- Dynamic Status -->
             </div>
           </div>
-          <div>
-            <span class="text-gray-400">Falanqaynta Kiimikada & Khatarta:</span>
-            <p id="resReason" class="text-gray-300 mt-1 bg-gray-950 p-3 rounded-lg border border-gray-800"></p>
+
+          <!-- Data Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs">
+            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 space-y-1">
+              <span class="text-slate-400 block font-mono text-[10px]">EXPIRY DATE</span>
+              <p id="resExpiry" class="text-sm font-bold text-white font-mono">---</p>
+            </div>
+            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 space-y-1">
+              <span class="text-slate-400 block font-mono text-[10px]">ORIGIN COUNTRY</span>
+              <p id="resOrigin" class="text-sm font-bold text-white">---</p>
+            </div>
+            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 space-y-1 col-span-2 sm:col-span-1">
+              <span class="text-slate-400 block font-mono text-[10px]">RISK SCORE</span>
+              <p id="resRiskScore" class="text-sm font-bold font-mono">---</p>
+            </div>
           </div>
+
+          <!-- Deep Chemical / Reason Breakdown -->
+          <div class="space-y-2">
+            <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+              <i data-lucide="flask-conical" class="w-4 h-4 text-emerald-400"></i>
+              Chemical & Safety Analysis Breakdown
+            </h4>
+            <div id="resReason" class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs text-slate-300 leading-relaxed font-sans">
+              <!-- AI Text -->
+            </div>
+          </div>
+
+          <!-- Actions Footer -->
+          <div class="pt-2 flex items-center justify-between border-t border-slate-800/80">
+            <span class="text-[11px] font-mono text-slate-400">VERIFIED BY NATIONAL SECURITY AI GATEWAY</span>
+            <button onclick="window.print()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-medium rounded-lg text-white transition flex items-center gap-1.5">
+              <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+              <span>Print Official Audit Report</span>
+            </button>
+          </div>
+
         </div>
+
       </div>
 
     </div>
 
-    <!-- Audit Logs / History Table -->
-    <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 space-y-4">
-      <h2 class="text-lg font-bold text-gray-200">3. Kaydka Baaritaannadii Ugu Danbeeyay (Recent Database Audit Logs)</h2>
-      
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-gray-400">
-          <thead class="bg-gray-950 text-gray-200 uppercase text-xs">
+    <!-- Bottom Section: Comprehensive Audit Logs Table -->
+    <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <i data-lucide="database" class="w-5 h-5 text-emerald-400"></i>
+            National Inspection Audit Database
+          </h2>
+          <p class="text-xs text-slate-400">Real-time sync from Firestore database across all border ports</p>
+        </div>
+        <button onclick="loadLogs()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-medium rounded-lg text-slate-200 transition flex items-center gap-2">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+          <span>Refresh Database</span>
+        </button>
+      </div>
+
+      <!-- Audit Table -->
+      <div class="overflow-x-auto rounded-xl border border-slate-800">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-950 text-slate-400 font-mono uppercase text-[10px] border-b border-slate-800">
             <tr>
-              <th class="p-3">Magaca Alaabta</th>
-              <th class="p-3">Port-ka</th>
-              <th class="p-3">Expiry Date</th>
-              <th class="p-3">Status-ka</th>
-              <th class="p-3">Waqtiga</th>
+              <th class="p-3.5">Product Details</th>
+              <th class="p-3.5">Checkpoint / Port</th>
+              <th class="p-3.5">Expiry Date</th>
+              <th class="p-3.5">Origin</th>
+              <th class="p-3.5">Safety Status</th>
+              <th class="p-3.5">Timestamp</th>
             </tr>
           </thead>
-          <tbody id="logsTableBody">
-            <!-- Data will load here from Firebase -->
+          <tbody id="logsTableBody" class="divide-y divide-slate-800/60 bg-slate-900/40">
+            <!-- Dynamic Rows -->
           </tbody>
         </table>
       </div>
@@ -106,35 +276,63 @@
 
   </main>
 
+  <!-- Script Configurations & Logic -->
   <script>
-    // 1. KU BADAL FIREBASE CONFIG-KAAGA PROPERLY
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // 1. FIREBASE CONFIGURATION
     const firebaseConfig = {
-      apiKey: "YOUR_FIREBASE_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "SENDER_ID",
-      appId: "APP_ID"
+      apiKey: "AIzaSyA_MEJPR1hkVGk8iUaI7-UzDNNJkPrkGhY",
+      authDomain: "somali-border-ai.firebaseapp.com",
+      projectId: "somali-border-ai",
+      storageBucket: "somali-border-ai.firebasestorage.app",
+      messagingSenderId: "966932869234",
+      appId: "1:966932869234:web:cdac670ba5ec245fd852eb"
     };
 
-    // 2. GEMINI API KEY-GAAGA KU SHOB
-    const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY";
+    // 2. GEMINI API KEY
+    const GEMINI_API_KEY = "AQ.Ab8RN6IVLTNNM367W0JF20-TK0nlK9Lfn_UNgbrLK1QVzOzClw";
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Run AI Analysis
+    let totalScanCount = 0;
+    let passedScanCount = 0;
+    let rejectedScanCount = 0;
+
+    function previewImage(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('imagePreview').src = e.target.result;
+          document.getElementById('imagePreviewContainer').classList.remove('hidden');
+          document.getElementById('dropzone').classList.add('hidden');
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function clearImage() {
+      document.getElementById('imageInput').value = "";
+      document.getElementById('imagePreviewContainer').classList.add('hidden');
+      document.getElementById('dropzone').classList.remove('hidden');
+    }
+
     async function runInspectionAI() {
       const fileInput = document.getElementById('imageInput');
       const port = document.getElementById('portLocation').value;
+      const officer = document.getElementById('officerBadge').value;
       const scanBtn = document.getElementById('scanBtn');
       
       if (!fileInput.files[0]) {
-        alert("Fadlan marka hore dooro sawirka alaabta!");
+        alert("Fadlan marka hore dooro ama soo upload-geree sawirka alaabta!");
         return;
       }
 
-      scanBtn.innerText = "⏳ Waa la baarayay AI System...";
+      scanBtn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> <span>ANALYZING PACKAGING & CHEMICALS...</span>`;
+      lucide.createIcons();
       scanBtn.disabled = true;
 
       try {
@@ -142,15 +340,17 @@
         const base64Data = await convertBase64(file);
         const pureBase64 = base64Data.split(',')[1];
 
-        const prompt = `System-kani waa Border Control Safety System. Baar sawirkan alaabta ah oo falanqee:
-        1. Product Name
-        2. Expiry Date (YYYY-MM-DD or Unknown)
-        3. Country of origin (if visible)
-        4. Kiimikooyin mamnuuc ah ama Expiry Status (SAFE, EXPIRED, DANGEROUS)
-        5. Reason details in Somali language.
+        const prompt = `System-kani waa Somali National Border Control AI. Baar sawirkan alaabta ah.
+        1. Identifey Product Name.
+        2. Identify Expiry Date (YYYY-MM-DD or 'EXPIRED' or 'UNKNOWN').
+        3. Country of origin.
+        4. Kiimikooyinka ku qoran (Ingredients analysis).
+        5. Qiimee haddii ay tahay alaab amaan ah ama dhacday/khatar ah (Status: SAFE ama EXPIRED ama DANGEROUS).
+        6. Risk score % (0% is completely safe, 100% is extremely hazardous/expired).
+        7. Bixiya falanqayn qoto dheer oo af-Somali ah.
 
-        U soo saar oo kaliya format JSON ah:
-        {"product_name": "", "expiry_date": "", "origin": "", "status": "SAFE", "reason": ""}`;
+        U soo saar format JSON ah oo kaliya:
+        {"product_name": "", "expiry_date": "", "origin": "", "status": "SAFE", "risk_score": 15, "reason": ""}`;
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
           method: 'POST',
@@ -169,30 +369,43 @@
         const rawText = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
         const result = JSON.parse(rawText);
 
-        // Update UI Display
-        document.getElementById('resultContainer').classList.remove('hidden');
-        document.getElementById('resProductName').innerText = result.product_name || "Lama ogaan magaca";
+        // Update UI Result Card
+        document.getElementById('resultPlaceholder').classList.add('hidden');
+        document.getElementById('resultCard').classList.remove('hidden');
+
+        document.getElementById('resProductName').innerText = result.product_name || "Unidentified Product";
         document.getElementById('resExpiry').innerText = result.expiry_date || "N/A";
         document.getElementById('resOrigin').innerText = result.origin || "Unknown";
         document.getElementById('resReason').innerText = result.reason;
+        
+        const riskEl = document.getElementById('resRiskScore');
+        riskEl.innerText = (result.risk_score || 0) + "%";
 
-        const badge = document.getElementById('riskBadge');
+        const badge = document.getElementById('statusBadge');
         if (result.status === 'SAFE') {
-          badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500";
-          badge.innerText = "✅ SAFE / OO OGOLAADAY";
+          badge.className = "px-4 py-1.5 rounded-full text-xs font-mono font-bold flex items-center gap-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 glow-emerald";
+          badge.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4"></i> PASSED / SAFE`;
+          riskEl.className = "text-sm font-bold font-mono text-emerald-400";
+          passedScanCount++;
         } else {
-          badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-red-500/20 text-red-400 border border-red-500";
-          badge.innerText = "🚨 EXPIRED / DANGEROUS";
+          badge.className = "px-4 py-1.5 rounded-full text-xs font-mono font-bold flex items-center gap-2 bg-red-500/10 text-red-400 border border-red-500/30 glow-red";
+          badge.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4"></i> REJECTED / HAZARDOUS`;
+          riskEl.className = "text-sm font-bold font-mono text-red-400";
+          rejectedScanCount++;
         }
+        totalScanCount++;
+        updateCounters();
 
         // Save Record to Firebase Firestore
-        await db.collection("inspections").add({
+        await db.collection("national_inspections").add({
           product_name: result.product_name,
           expiry_date: result.expiry_date,
           origin: result.origin,
           status: result.status,
+          risk_score: result.risk_score,
           reason: result.reason,
           port: port,
+          officer_badge: officer,
           created_at: firebase.firestore.FieldValue.serverTimestamp()
         });
 
@@ -201,9 +414,16 @@
       } catch (err) {
         alert("Cillad ayaa dhacday: " + err.message);
       } finally {
-        scanBtn.innerText = "⚡ Falanqee Sawirka (Run AI Inspection)";
+        scanBtn.innerHTML = `<i data-lucide="cpu" class="w-5 h-5"></i> <span>EXECUTE AI DEEP INSPECTION</span>`;
+        lucide.createIcons();
         scanBtn.disabled = false;
       }
+    }
+
+    function updateCounters() {
+      document.getElementById('counterTotal').innerText = totalScanCount;
+      document.getElementById('counterPassed').innerText = passedScanCount;
+      document.getElementById('counterRejected').innerText = rejectedScanCount;
     }
 
     // Load Records from Firebase
@@ -211,24 +431,29 @@
       const tbody = document.getElementById('logsTableBody');
       tbody.innerHTML = "";
       
-      const snapshot = await db.collection("inspections").orderBy("created_at", "desc").limit(10).get();
-      snapshot.forEach(doc => {
-        const d = doc.data();
-        const row = `
-          <tr class="border-b border-gray-800 hover:bg-gray-950">
-            <td class="p-3 font-semibold text-white">${d.product_name || 'N/A'}</td>
-            <td class="p-3">${d.port || 'N/A'}</td>
-            <td class="p-3">${d.expiry_date || 'N/A'}</td>
-            <td class="p-3">
-              <span class="px-2 py-0.5 rounded text-xs ${d.status === 'SAFE' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-red-950 text-red-400 border border-red-800'}">
-                ${d.status}
-              </span>
-            </td>
-            <td class="p-3 text-xs text-gray-500">${d.created_at ? new Date(d.created_at.toDate()).toLocaleTimeString() : 'Now'}</td>
-          </tr>
-        `;
-        tbody.innerHTML += row;
-      });
+      try {
+        const snapshot = await db.collection("national_inspections").orderBy("created_at", "desc").limit(15).get();
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          const row = `
+            <tr class="hover:bg-slate-800/40 transition">
+              <td class="p-3.5 font-bold text-white">${d.product_name || 'N/A'}</td>
+              <td class="p-3.5 text-slate-300">${d.port || 'N/A'}</td>
+              <td class="p-3.5 font-mono text-slate-300">${d.expiry_date || 'N/A'}</td>
+              <td class="p-3.5 text-slate-300">${d.origin || 'Unknown'}</td>
+              <td class="p-3.5">
+                <span class="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold ${d.status === 'SAFE' ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-800' : 'bg-red-950/80 text-red-400 border border-red-800'}">
+                  ${d.status}
+                </span>
+              </td>
+              <td class="p-3.5 font-mono text-slate-500 text-[11px]">${d.created_at ? new Date(d.created_at.toDate()).toLocaleTimeString() : 'Just now'}</td>
+            </tr>
+          `;
+          tbody.innerHTML += row;
+        });
+      } catch(e) {
+        console.log("Database loading error: ", e);
+      }
     }
 
     function convertBase64(file) {
@@ -240,7 +465,6 @@
       });
     }
 
-    // Initial Load
     window.onload = loadLogs;
   </script>
 </body>
