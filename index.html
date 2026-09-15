@@ -3,172 +3,282 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistemka Dawa-galinta Bukaanka & Camera Capture</title>
-    <!-- Tailwind CSS CDN si uu design-ka u noqdo mid casri ah -->
+    <title>Sistemka Diwaan-galinta Bukaanka - Advanced Form</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .filter-normal { filter: none; }
+        .filter-iphone { filter: brightness(1.08) contrast(1.05) saturate(1.2); }
+        .filter-vivid { filter: brightness(1.15) contrast(1.1) saturate(1.4); }
+        .filter-bw { filter: grayscale(100%); }
+        .filter-warm { filter: sepia(30%) brightness(1.05) saturate(1.1); }
+    </style>
 </head>
-<body class="bg-slate-100 min-h-screen font-sans p-4 md:p-8">
+<body class="bg-slate-100 min-h-screen font-sans p-3 md:p-6">
 
-    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
+    <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200">
         <!-- Header -->
-        <div class="bg-blue-600 p-6 text-white flex justify-between items-center">
+        <div class="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-6 text-white flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
-                <h1 class="text-2xl font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-hospital-user"></i> Diwaan-galinta Bukaanka Cusub
+                <h1 class="text-2xl md:text-3xl font-extrabold flex items-center gap-3">
+                    <i class="fa-solid fa-hospital-user text-blue-300"></i> Diwaan-galinta Bukaanka & Camera Pro
                 </h1>
-                <p class="text-blue-100 text-sm mt-1">Buuxi foomka oo ka qaad sawir bukaanka toos ah.</p>
+                <p class="text-blue-100 text-sm mt-1">Buuxi foomka oo ka qaad sawir tayo sarreeya leh oo iPhone-style ah.</p>
             </div>
-            <span class="bg-blue-700 text-xs font-semibold px-3 py-1 rounded-full border border-blue-400">Live Camera Ready</span>
+            <span class="bg-white/20 backdrop-blur-md text-white text-xs font-semibold px-4 py-2 rounded-full border border-white/30 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></span> Camera Live System
+            </span>
         </div>
 
         <form id="patientForm" class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <!-- QAYBTA CAMERA-DA & SAWIRKA (LEFT COLUMN) -->
+            <!-- LEFT COLUMN: CAMERA & PHOTO EDITING -->
             <div class="lg:col-span-5 flex flex-col items-center border-b lg:border-b-0 lg:border-r border-gray-200 pb-6 lg:pb-0 lg:pr-6">
-                <h2 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-camera text-blue-600"></i> Sawirka Bukaanka
+                <h2 class="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2 w-full">
+                    <i class="fa-solid fa-camera text-blue-600"></i> Sawirka Bukaanka (iPhone Camera Mode)
                 </h2>
 
-                <!-- Live Camera Stream Box -->
-                <div class="relative w-full max-w-[320px] h-[240px] bg-black rounded-xl overflow-hidden shadow-inner border-2 border-gray-300">
-                    <video id="webcam" autoplay playsinline class="w-full h-full object-cover transform -scale-x-100"></video>
-                    <span class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <span class="w-2 h-2 bg-white rounded-full animate-ping"></span> LIVE
+                <!-- Camera Stream Box -->
+                <div class="relative w-full max-w-[340px] h-[255px] bg-black rounded-2xl overflow-hidden shadow-lg border-4 border-gray-800">
+                    <video id="webcam" autoplay playsinline class="w-full h-full object-cover filter-iphone transform -scale-x-100 transition-all duration-300"></video>
+                    <span class="absolute top-3 left-3 bg-red-600/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow">
+                        <span class="w-2 h-2 bg-white rounded-full animate-ping"></span> HD LIVE
                     </span>
+                    <div id="flashEffect" class="absolute inset-0 bg-white opacity-0 transition-opacity duration-150 pointer-events-none"></div>
                 </div>
 
-                <!-- Camera Controls Buttons -->
-                <div class="flex gap-2 mt-4 w-full max-w-[320px]">
-                    <button type="button" id="switchCamBtn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-3 rounded-lg text-xs font-medium border transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-rotate"></i> Badal Cam-da
+                <!-- Camera Controls -->
+                <div class="flex gap-2 mt-4 w-full max-w-[340px]">
+                    <button type="button" id="switchCamBtn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 px-3 rounded-xl text-xs font-semibold border transition flex items-center justify-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-rotate"></i> Badal Cam
                     </button>
-                    <button type="button" id="captureBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-2 shadow-md">
-                        <i class="fa-solid fa-camera-retro"></i> Qaad Sawir
+                    <button type="button" id="captureBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md active:scale-95">
+                        <i class="fa-solid fa-circle-dot text-red-400"></i> Qaad Sawir
                     </button>
                 </div>
 
-                <!-- Captured Image Preview Canvas -->
-                <div class="mt-6 w-full max-w-[320px]">
-                    <label class="block text-xs font-medium text-gray-500 mb-2">Sawirka La Qaaday (Captured Image):</label>
-                    <div class="w-full h-[180px] bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative">
+                <!-- Live Filters / iPhone Edit Effect -->
+                <div class="w-full max-w-[340px] mt-4">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1.5"><i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> Filter / Style Sawirka:</label>
+                    <div class="grid grid-cols-4 gap-1.5">
+                        <button type="button" onclick="setFilter('filter-iphone')" class="bg-slate-100 hover:bg-slate-200 py-1.5 text-[11px] font-medium rounded-lg border text-gray-700">iPhone</button>
+                        <button type="button" onclick="setFilter('filter-vivid')" class="bg-slate-100 hover:bg-slate-200 py-1.5 text-[11px] font-medium rounded-lg border text-gray-700">Vivid</button>
+                        <button type="button" onclick="setFilter('filter-warm')" class="bg-slate-100 hover:bg-slate-200 py-1.5 text-[11px] font-medium rounded-lg border text-gray-700">Warm</button>
+                        <button type="button" onclick="setFilter('filter-bw')" class="bg-slate-100 hover:bg-slate-200 py-1.5 text-[11px] font-medium rounded-lg border text-gray-700">B&W</button>
+                    </div>
+                </div>
+
+                <!-- Photo Preview Canvas -->
+                <div class="mt-5 w-full max-w-[340px]">
+                    <div class="flex justify-between items-center mb-1.5">
+                        <label class="text-xs font-semibold text-gray-600">Sawirka La Qaaday (Preview):</label>
+                        <button type="button" id="retakeBtn" class="text-xs text-blue-600 hover:underline hidden font-medium"><i class="fa-solid fa-arrows-rotate"></i> Dib u qaad</button>
+                    </div>
+                    <div class="w-full h-[200px] bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative shadow-inner">
                         <canvas id="canvas" class="hidden w-full h-full object-cover"></canvas>
                         <p id="placeholderText" class="text-gray-400 text-xs text-center px-4">
-                            Saafeeyo ama guji "Qaad Sawir" si uu halkan ugu muuqdo.
+                            <i class="fa-regular fa-image text-2xl mb-1 block"></i>
+                            Guji "Qaad Sawir" si uu halkan ugu muuqdo.
                         </p>
                     </div>
                 </div>
             </div>
 
-            <!-- QAYBTA FOOMAMKA IYO XOGTA (RIGHT COLUMN) -->
+            <!-- RIGHT COLUMN: FORM DATA -->
             <div class="lg:col-span-7 flex flex-col gap-6">
                 
-                <!-- Section 1: Basic Patient Details -->
-                <div>
-                    <h3 class="text-md font-semibold text-gray-800 border-b pb-2 mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-user text-blue-500"></i> Xogta Shaqsiga ah
+                <!-- 1. Xogta Bukaanka -->
+                <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-200">
+                    <h3 class="text-sm font-bold text-gray-800 border-b pb-2 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-user text-blue-600"></i> 1. Xogta Bukaanka (Patient Details)
                     </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Magaca Dhamaystiran</label>
-                            <input type="text" required placeholder="Tusaale: Cabdi Cali Maxamed" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Magaca Dhamaystiran *</label>
+                            <input type="text" id="patientName" required placeholder="Magaca, Aabbaha, Awoowaha" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Nambarka Telefoonka</label>
-                            <input type="tel" required placeholder="61XXXXXXX" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Nambarka Telefoonka *</label>
+                            <input type="tel" id="patientPhone" required placeholder="61XXXXXXX" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Da'da (Years)</label>
-                            <input type="number" min="0" placeholder="25" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Da'da (Years) *</label>
+                            <input type="number" id="patientAge" required min="0" placeholder="Da'da" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Jinsiga</label>
-                            <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="male">Labi (Male)</option>
-                                <option value="female">Dheddig (Female)</option>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Jinsiga *</label>
+                            <select id="patientGender" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+                                <option value="Labi (Male)">Labi (Male)</option>
+                                <option value="Dheddig (Female)">Dheddig (Female)</option>
                             </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Goobta Dhalashada / Anshaxa</label>
+                            <input type="text" id="patientAddress" placeholder="Mogadishu, Somalia" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
                         </div>
                     </div>
                 </div>
 
-                <!-- Section 2: Clinical Details & Vital Signs -->
-                <div>
-                    <h3 class="text-md font-semibold text-gray-800 border-b pb-2 mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-heart-pulse text-red-500"></i> Xaaladda Caafimaad (Vitals)
+                <!-- 2. Xogta Waalidiinta & Mas'uulka -->
+                <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-200">
+                    <h3 class="text-sm font-bold text-gray-800 border-b pb-2 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-users text-indigo-600"></i> 2. Xogta Waalidiinta & Mas'uulka
                     </h3>
-                    <div class="grid grid-cols-3 gap-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                        <!-- Aabbaha -->
                         <div>
-                            <label class="block text-[11px] font-medium text-gray-600 mb-1">Dhiigkar (BP)</label>
-                            <input type="text" placeholder="120/80" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Magaca Aabbaha</label>
+                            <input type="text" id="fatherName" placeholder="Magaca Aabbaha" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-medium text-gray-600 mb-1">Kuleylka (°C)</label>
-                            <input type="text" placeholder="37.0" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Tel-ka Aabbaha</label>
+                            <input type="tel" id="fatherPhone" placeholder="61XXXXXXX" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+                        </div>
+                        <!-- Hooyada -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Magaca Hooyada</label>
+                            <input type="text" id="motherName" placeholder="Magaca Hooyada" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-medium text-gray-600 mb-1">Miisaanka (Kg)</label>
-                            <input type="text" placeholder="70 kg" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Tel-ka Hooyada</label>
+                            <input type="tel" id="motherPhone" placeholder="61XXXXXXX" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+                        </div>
+                        <!-- Mas'uulka / Guardian -->
+                        <div class="md:col-span-2 border-t pt-2 mt-1">
+                            <p class="text-[11px] font-bold text-indigo-700 mb-2">Mas'uulka Dheeraadka ah (Guardian / Emergency Contact):</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Magaca Mas'uulka</label>
+                            <input type="text" id="guardianName" placeholder="Magaca Mas'uulka" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Tel-ka Mas'uulka</label>
+                            <input type="tel" id="guardianPhone" placeholder="61XXXXXXX" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Xiriirka uu la leeyahay Bukaanka (Relationship)</label>
+                            <input type="text" id="guardianRelation" placeholder="Tusaale: Adeer, Eedo, Walaal, Dhaar, Shaqo-bixiye..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
                         </div>
                     </div>
                 </div>
 
-                <!-- Section 3: Doctor & Department Selection -->
-                <div>
-                    <h3 class="text-md font-semibold text-gray-800 border-b pb-2 mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-user-doctor text-green-600"></i> Waaxda & Dhaqtarka
+                <!-- 3. Xogta Dhaqtarka (Gacanta lagu qorayo) -->
+                <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-200">
+                    <h3 class="text-sm font-bold text-gray-800 border-b pb-2 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-user-doctor text-emerald-600"></i> 3. Xogta Dhaqtarka & Waaxda
                     </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Waaxda (Department)</label>
-                            <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option>General OPD</option>
-                                <option>Pediatrics (Caruurta)</option>
-                                <option>Cardiology (Wadnaha)</option>
-                                <option>Dental (Ilkaha)</option>
-                                <option>Emergency (Xaalad degdeg ah)</option>
-                            </select>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Magaca Dhaqtarka (Gacanta ku qor) *</label>
+                            <input type="text" id="doctorName" required placeholder="Dr. Cabdiraxmaan Maxamed" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Dhaqtarka Khasak ah</label>
-                            <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option>Dr. Axmed (Generalist)</option>
-                                <option>Dr. Caasho (Pediatrician)</option>
-                                <option>Dr. Farxaan (Cardiologist)</option>
-                            </select>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Waaxda / Department-ka uu ka tirsan yahay *</label>
+                            <input type="text" id="doctorDept" required placeholder="General Medicine, OPD, Cardiology..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Chamber / Qolka Dhaqtarka</label>
+                            <input type="text" id="doctorRoom" placeholder="Room 102, Floor 2" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Taariikhda Ballanta</label>
+                            <input type="date" id="appointDate" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
                         </div>
                     </div>
-                </div>
-
-                <!-- Section 4: Notes -->
-                <div>
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Cabashada Bukaanka / Notes</label>
-                    <textarea rows="2" placeholder="Sida calaamadaha, xanuunka uu ka cabanayo..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                 </div>
 
                 <!-- Submit Button -->
-                <div class="pt-2">
-                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-paper-plane"></i> Keydi Xogta & Diwaan-geli Bukaanka
-                    </button>
-                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-xl transition flex items-center justify-center gap-2 text-base">
+                    <i class="fa-solid fa-floppy-disk text-lg"></i> Keydi Xogta & Soo Saar Kaarka (Receipt)
+                </button>
 
             </div>
         </form>
     </div>
 
-    <!-- JAVASCRIPT FOR CAMERA AND FORM LOGIC -->
+    <!-- PROFESSIONAL RECEIPT / CONFIRMATION MODAL -->
+    <div id="receiptModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 md:p-8 relative border border-gray-200">
+            <!-- Close Button -->
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-xl"><i class="fa-solid fa-xmark"></i></button>
+
+            <!-- Card Content to Print -->
+            <div id="printArea">
+                <div class="border-b-2 border-dashed border-gray-300 pb-4 mb-4 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-blue-700">KALKAAL HOSPITAL</h2>
+                        <p class="text-xs text-gray-500">Patient Registration & Appointment Ticket</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-bold text-gray-400 block">TICKET ID</span>
+                        <span id="resTicketId" class="text-base font-mono font-bold text-gray-800">#KL-8923</span>
+                    </div>
+                </div>
+
+                <!-- Patient Overview Header -->
+                <div class="flex items-center gap-5 bg-slate-50 p-4 rounded-xl border border-slate-200 mb-5">
+                    <div class="w-24 h-24 rounded-lg bg-gray-200 overflow-hidden border-2 border-blue-500 flex-shrink-0 shadow-sm">
+                        <img id="resPhoto" src="" alt="Patient" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1">
+                        <h3 id="resName" class="text-xl font-bold text-gray-800">--</h3>
+                        <p class="text-xs text-gray-600 mt-1"><i class="fa-solid fa-phone text-blue-500 mr-1"></i> <span id="resPhone">--</span></p>
+                        <p class="text-xs text-gray-600"><i class="fa-solid fa-cake-candles text-pink-500 mr-1"></i> <span id="resAgeGender">--</span></p>
+                        <p class="text-xs text-gray-600"><i class="fa-solid fa-location-dot text-red-500 mr-1"></i> <span id="resAddress">--</span></p>
+                    </div>
+                </div>
+
+                <!-- Detailed Info Grid -->
+                <div class="grid grid-cols-2 gap-4 text-xs text-gray-700 mb-5">
+                    <div class="bg-blue-50/60 p-3 rounded-lg border border-blue-100">
+                        <p class="font-bold text-blue-800 mb-1 border-b pb-1"><i class="fa-solid fa-user-doctor"></i> Dhaqtarka & Waaxda</p>
+                        <p><strong>Dhaqtarka:</strong> <span id="resDoctor">--</span></p>
+                        <p><strong>Waaxda:</strong> <span id="resDept">--</span></p>
+                        <p><strong>Qolka:</strong> <span id="resRoom">--</span></p>
+                    </div>
+                    <div class="bg-indigo-50/60 p-3 rounded-lg border border-indigo-100">
+                        <p class="font-bold text-indigo-800 mb-1 border-b pb-1"><i class="fa-solid fa-users"></i> Waalidiinta & Mas'uulka</p>
+                        <p><strong>Aabbaha:</strong> <span id="resFather">--</span></p>
+                        <p><strong>Hooyada:</strong> <span id="resMother">--</span></p>
+                        <p><strong>Mas'uulka:</strong> <span id="resGuardian">--</span></p>
+                    </div>
+                </div>
+
+                <div class="text-center text-[10px] text-gray-400 border-t pt-3">
+                    Waad ku mahadsan tahay doorashada Kalkaal Hospital. Taariikhda: <span id="resDate">--</span>
+                </div>
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="flex gap-3 mt-6">
+                <button onclick="window.print()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-print"></i> Print / Download PDF
+                </button>
+                <button onclick="closeModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-5 py-2.5 rounded-xl transition text-sm">
+                    Xir (Close)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
     <script>
         const video = document.getElementById('webcam');
         const canvas = document.getElementById('canvas');
         const captureBtn = document.getElementById('captureBtn');
         const switchCamBtn = document.getElementById('switchCamBtn');
         const placeholderText = document.getElementById('placeholderText');
+        const retakeBtn = document.getElementById('retakeBtn');
         const patientForm = document.getElementById('patientForm');
+        const flashEffect = document.getElementById('flashEffect');
 
         let currentStream = null;
-        let facingMode = "user"; // "user" = Front Camera, "environment" = Back Camera
+        let facingMode = "user"; 
+        let currentFilter = "filter-iphone";
+        let capturedDataUrl = null;
 
-        // Start Camera Function
+        // Start Camera
         async function startCamera(mode) {
             if (currentStream) {
                 currentStream.getTracks().forEach(track => track.stop());
@@ -177,8 +287,8 @@
             const constraints = {
                 video: {
                     facingMode: mode,
-                    width: { ideal: 640 },
-                    height: { ideal: 480 }
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
                 },
                 audio: false
             };
@@ -186,57 +296,98 @@
             try {
                 currentStream = await navigator.mediaDevices.getUserMedia(constraints);
                 video.srcObject = currentStream;
-                
-                // Mirror video if Front Camera
                 if (mode === 'user') {
-                    video.classList.add('transform', '-scale-x-100');
+                    video.classList.add('-scale-x-100');
                 } else {
-                    video.classList.remove('transform', '-scale-x-100');
+                    video.classList.remove('-scale-x-100');
                 }
             } catch (err) {
-                console.error("Camera access error: ", err);
-                alert("Kamarada lama furi karin. Fadlan hubi fasax ku siinta browser-ka.");
+                console.error("Camera access error:", err);
             }
         }
 
-        // Initialize front camera on load
+        // Filter Setter
+        function setFilter(filterClass) {
+            currentFilter = filterClass;
+            video.className = `w-full h-full object-cover transform transition-all duration-300 ${filterClass} ${facingMode === 'user' ? '-scale-x-100' : ''}`;
+        }
+
+        // Initialize Camera
         startCamera(facingMode);
 
-        // Switch Camera (Front / Back)
+        // Switch Camera
         switchCamBtn.addEventListener('click', () => {
             facingMode = facingMode === "user" ? "environment" : "user";
             startCamera(facingMode);
         });
 
-        // Capture Snapshot
+        // Capture Photo (iPhone Style Flash)
         captureBtn.addEventListener('click', () => {
-            const context = canvas.getContext('2d');
-            canvas.width = 320;
-            canvas.height = 240;
+            // Flash animation
+            flashEffect.classList.remove('opacity-0');
+            setTimeout(() => flashEffect.classList.add('opacity-0'), 150);
 
-            // Draw image on canvas
+            const context = canvas.getContext('2d');
+            canvas.width = 400;
+            canvas.height = 300;
+
             if (facingMode === 'user') {
                 context.translate(canvas.width, 0);
                 context.scale(-1, 1);
             }
-            
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Display Canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            capturedDataUrl = canvas.toDataURL('image/png');
+
             canvas.classList.remove('hidden');
             placeholderText.classList.add('hidden');
+            retakeBtn.classList.remove('hidden');
         });
 
-        // Submit Form
+        retakeBtn.addEventListener('click', () => {
+            canvas.classList.add('hidden');
+            placeholderText.classList.remove('hidden');
+            retakeBtn.classList.add('hidden');
+            capturedDataUrl = null;
+        });
+
+        // Form Submit & Modal
         patientForm.addEventListener('submit', (e) => {
             e.preventDefault();
+
+            // Set Data to Modal
+            document.getElementById('resName').innerText = document.getElementById('patientName').value;
+            document.getElementById('resPhone').innerText = document.getElementById('patientPhone').value;
+            document.getElementById('resAgeGender').innerText = `${document.getElementById('patientAge').value} Sano | ${document.getElementById('patientGender').value}`;
+            document.getElementById('resAddress').innerText = document.getElementById('patientAddress').value || "Mogadishu";
             
-            // Convert captured image to Data URL if needed
-            let imageData = canvas.classList.contains('hidden') ? null : canvas.toDataURL('image/png');
+            // Doctor
+            document.getElementById('resDoctor').innerText = document.getElementById('doctorName').value;
+            document.getElementById('resDept').innerText = document.getElementById('doctorDept').value;
+            document.getElementById('resRoom').innerText = document.getElementById('doctorRoom').value || "Room 01";
+
+            // Parents & Guardian
+            document.getElementById('resFather').innerText = `${document.getElementById('fatherName').value || 'N/A'} (${document.getElementById('fatherPhone').value || '-'})`;
+            document.getElementById('resMother').innerText = `${document.getElementById('motherName').value || 'N/A'} (${document.getElementById('motherPhone').value || '-'})`;
             
-            alert("Xogta iyo Sawirka bukaanka si guul leh ayaa loo kaydiyay!");
-            console.log("Captured Image Data:", imageData);
+            const gName = document.getElementById('guardianName').value;
+            const gRel = document.getElementById('guardianRelation').value;
+            document.getElementById('resGuardian').innerText = gName ? `${gName} [${gRel || 'Mas'uul'}]` : 'N/A';
+
+            // Photo
+            document.getElementById('resPhoto').src = capturedDataUrl || 'https://via.placeholder.com/150?text=No+Photo';
+            
+            // Date & Ticket
+            document.getElementById('resTicketId').innerText = "#KL-" + Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('resDate').innerText = new Date().toLocaleDateString('so-SO');
+
+            // Open Modal
+            document.getElementById('receiptModal').classList.remove('hidden');
         });
+
+        function closeModal() {
+            document.getElementById('receiptModal').classList.add('hidden');
+        }
     </script>
 </body>
 </html>
