@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CABDIRAXMAN HOSPITAL - Patient Registration & Camera Pro</title>
+    <title>CABDIRAXMAN HOSPITAL - Patient Registration & Professional PDF</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- html2pdf.js for Generating PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        .filter-iphone { filter: brightness(1.08) contrast(1.05) saturate(1.2); }
-        .filter-vivid { filter: brightness(1.15) contrast(1.1) saturate(1.4); }
-        .filter-warm { filter: sepia(30%) brightness(1.05) saturate(1.1); }
-        .filter-bw { filter: grayscale(100%); }
-
         @media print {
             body * { visibility: hidden; }
             #printArea, #printArea * { visibility: visible; }
-            #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+            #printArea { position: absolute; left: 0; top: 0; width: 100%; background: white !important; }
             .no-print { display: none !important; }
+        }
+        /* PDF Specific Styling to ensure non-transparent background */
+        .pdf-export-container {
+            background-color: #ffffff !important;
+            color: #000000 !important;
         }
     </style>
 </head>
@@ -57,16 +57,16 @@
 
         <form id="patientForm" class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <!-- LEFT COLUMN: CAMERA & PHOTO CAPTURE -->
+            <!-- LEFT COLUMN: CAMERA & FILE UPLOAD PHOTO -->
             <div class="lg:col-span-5 flex flex-col items-center border-b lg:border-b-0 lg:border-r border-gray-200 pb-6 lg:pb-0 lg:pr-6">
                 <h2 class="text-base font-bold text-gray-800 mb-3 flex items-center justify-between w-full">
-                    <span><i class="fa-solid fa-camera text-blue-600"></i> Sawirka Bukaanka (HD Camera)</span>
+                    <span><i class="fa-solid fa-camera text-blue-600"></i> Sawirka Bukaanka</span>
                     <button type="button" onclick="initCamera()" class="text-xs text-blue-600 underline"><i class="fa-solid fa-power-off"></i> Refresh Cam</button>
                 </h2>
 
                 <!-- Live Camera Stream Container -->
                 <div class="relative w-full max-w-[340px] h-[255px] bg-gray-900 rounded-2xl overflow-hidden shadow-lg border-4 border-gray-800 flex items-center justify-center">
-                    <video id="webcam" autoplay playsinline muted class="w-full h-full object-cover filter-iphone transform -scale-x-100"></video>
+                    <video id="webcam" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100"></video>
                     
                     <span id="liveBadge" class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow hidden">
                         <span class="w-2 h-2 bg-white rounded-full animate-ping"></span> LIVE
@@ -84,38 +84,36 @@
                     <div id="flashEffect" class="absolute inset-0 bg-white opacity-0 transition-opacity duration-150 pointer-events-none"></div>
                 </div>
 
-                <!-- Camera Controls -->
+                <!-- Camera & Upload Controls -->
                 <div class="flex gap-2 mt-4 w-full max-w-[340px]">
-                    <button type="button" id="switchCamBtn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 px-3 rounded-xl text-xs font-semibold border transition flex items-center justify-center gap-1.5 shadow-sm">
+                    <button type="button" id="switchCamBtn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 px-2 rounded-xl text-xs font-semibold border transition flex items-center justify-center gap-1 shadow-sm">
                         <i class="fa-solid fa-rotate"></i> Badal Cam
                     </button>
-                    <button type="button" id="captureBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md active:scale-95">
+                    <button type="button" id="captureBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-md active:scale-95">
                         <i class="fa-solid fa-circle-dot text-red-400"></i> Qaad Sawir
                     </button>
                 </div>
 
-                <!-- Filters -->
-                <div class="w-full max-w-[340px] mt-4">
-                    <label class="block text-xs font-semibold text-gray-600 mb-1.5"><i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> Filter Style:</label>
-                    <div class="grid grid-cols-4 gap-1.5">
-                        <button type="button" onclick="setFilter('filter-iphone')" class="bg-slate-100 hover:bg-slate-200 py-1.5 text-[11px] font-medium rounded-lg border text-gray-700">iPhone</button>
-                        <button type="button" onclick="setFilter('filter-vivid')" class="bg-slate-100 hover:bg-slate-200 py-1.5 text-[11px] font-medium rounded-lg border text-gray-700">Vivid</button>
-                        <button type="button" onclick="setFilter('filter-warm')" class="bg-slate-100 hover:bg-slate-200 py-1.5 text-[11px] font-medium rounded-lg border text-gray-700">Warm</button>
-                        <button type="button" onclick="setFilter('filter-bw')" class="bg-slate-100 hover:bg-slate-200 py-1.5 text-[11px] font-medium rounded-lg border text-gray-700">B&W</button>
-                    </div>
+                <!-- NEW: UPLOAD PHOTO FROM DEVICE -->
+                <div class="w-full max-w-[340px] mt-3">
+                    <label class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold py-2.5 px-3 rounded-xl text-xs border border-emerald-300 transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                        <i class="fa-solid fa-upload text-emerald-600"></i> Sawir Ka Soo Gali Telefoonka / Gallery
+                        <input type="file" id="imageUploadInput" accept="image/*" class="hidden">
+                    </label>
                 </div>
 
                 <!-- Photo Preview Canvas -->
                 <div class="mt-5 w-full max-w-[340px]">
                     <div class="flex justify-between items-center mb-1.5">
-                        <label class="text-xs font-semibold text-gray-600">Sawirka La Qaaday:</label>
-                        <button type="button" id="retakeBtn" class="text-xs text-blue-600 hover:underline hidden font-medium"><i class="fa-solid fa-arrows-rotate"></i> Dib u qaad</button>
+                        <label class="text-xs font-semibold text-gray-600">Sawirka Diyaar Ah:</label>
+                        <button type="button" id="retakeBtn" class="text-xs text-blue-600 hover:underline hidden font-medium"><i class="fa-solid fa-arrows-rotate"></i> Dib u dooro / qaad</button>
                     </div>
                     <div class="w-full h-[200px] bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative shadow-inner">
                         <canvas id="canvas" class="hidden w-full h-full object-cover"></canvas>
+                        <img id="uploadedImagePreview" class="hidden w-full h-full object-cover" alt="Uploaded Preview">
                         <p id="placeholderText" class="text-gray-400 text-xs text-center px-4">
                             <i class="fa-regular fa-image text-2xl mb-1 block"></i>
-                            Guji "Qaad Sawir" si uu halkan ugu muuqdo.
+                            Sawir qaad ama ka soo gali gallery-ga.
                         </p>
                     </div>
                 </div>
@@ -233,11 +231,11 @@
             <!-- Close Button -->
             <button onclick="closeModal()" class="no-print absolute top-4 right-4 bg-gray-100 hover:bg-gray-200 text-gray-700 w-8 h-8 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-xmark"></i></button>
 
-            <!-- PRINTABLE DOCUMENT AREA -->
-            <div id="printArea" class="p-2">
+            <!-- PRINTABLE DOCUMENT AREA (ENFORCED WHITE BACKGROUND) -->
+            <div id="printArea" class="p-4 bg-white pdf-export-container rounded-lg">
                 
                 <!-- DOCUMENT HEADER -->
-                <div class="border-b-4 border-blue-900 pb-4 mb-6 flex justify-between items-center">
+                <div class="border-b-4 border-blue-900 pb-4 mb-6 flex justify-between items-center bg-white">
                     <div>
                         <h1 class="text-2xl font-black text-blue-900 tracking-wider">CABDIRAXMAN HOSPITAL</h1>
                         <p class="text-xs text-blue-700 font-semibold">MOGADISHU, SOMALIA | TEL: +252 61 304 0087</p>
@@ -251,23 +249,23 @@
                     </div>
                 </div>
 
-                <div class="text-center my-4">
+                <div class="text-center my-4 bg-white">
                     <span class="bg-blue-900 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">Official Registration Document</span>
                 </div>
 
                 <!-- TICKET / DATE INFO -->
-                <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border text-xs mb-6">
-                    <div><strong>REGISTRATION ID:</strong> <span id="resTicketId" class="text-blue-800 font-bold">#CRH-8923</span></div>
-                    <div><strong>TAARIIKH:</strong> <span id="resDate">--</span></div>
+                <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-200 text-xs mb-6">
+                    <div><strong class="text-gray-800">REGISTRATION ID:</strong> <span id="resTicketId" class="text-blue-800 font-bold">#CRH-8923</span></div>
+                    <div><strong class="text-gray-800">TAARIIKH:</strong> <span id="resDate" class="text-gray-800">--</span></div>
                 </div>
 
                 <!-- PATIENT OVERVIEW -->
-                <div class="flex items-start gap-6 bg-slate-50 p-4 rounded-xl border mb-6">
+                <div class="flex items-start gap-6 bg-slate-50 p-4 rounded-xl border border-gray-200 mb-6">
                     <div class="w-28 h-28 rounded-xl bg-gray-200 overflow-hidden border-2 border-blue-800 flex-shrink-0 shadow">
                         <img id="resPhoto" src="" alt="Patient Photo" class="w-full h-full object-cover">
                     </div>
-                    <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-xs flex-1">
-                        <div class="col-span-2 text-sm font-bold text-gray-900 border-b pb-1 mb-1">
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-xs flex-1 text-gray-800">
+                        <div class="col-span-2 text-sm font-bold text-gray-900 border-b border-gray-200 pb-1 mb-1">
                             <span id="resName">--</span>
                         </div>
                         <div><strong>Telefoonka:</strong> <span id="resPhone">--</span></div>
@@ -278,8 +276,8 @@
 
                 <!-- PARENTS & GUARDIAN DETAILS -->
                 <div class="mb-6">
-                    <h4 class="text-xs font-bold uppercase text-gray-700 border-b pb-1 mb-2">Xogta Waalidiinta & Mas'uulka</h4>
-                    <div class="grid grid-cols-3 gap-3 text-xs bg-gray-50 p-3 rounded-lg border">
+                    <h4 class="text-xs font-bold uppercase text-gray-700 border-b border-gray-200 pb-1 mb-2">Xogta Waalidiinta & Mas'uulka</h4>
+                    <div class="grid grid-cols-3 gap-3 text-xs bg-gray-50 p-3 rounded-lg border border-gray-200 text-gray-800">
                         <div><strong>Aabbaha:</strong> <p id="resFather" class="text-gray-700">--</p></div>
                         <div><strong>Hooyada:</strong> <p id="resMother" class="text-gray-700">--</p></div>
                         <div><strong>Mas'uulka:</strong> <p id="resGuardian" class="text-gray-700">--</p></div>
@@ -288,25 +286,25 @@
 
                 <!-- DOCTOR & DEPARTMENT DETAILS -->
                 <div class="mb-8">
-                    <h4 class="text-xs font-bold uppercase text-gray-700 border-b pb-1 mb-2">Xogta Dhaqtarka & Waaxda</h4>
-                    <div class="grid grid-cols-3 gap-3 text-xs bg-blue-50/50 p-3 rounded-lg border border-blue-100">
+                    <h4 class="text-xs font-bold uppercase text-gray-700 border-b border-gray-200 pb-1 mb-2">Xogta Dhaqtarka & Waaxda</h4>
+                    <div class="grid grid-cols-3 gap-3 text-xs bg-blue-50/60 p-3 rounded-lg border border-blue-100 text-gray-800">
                         <div><strong>Dhaqtarka:</strong> <p id="resDoctor" class="text-blue-900 font-semibold">--</p></div>
                         <div><strong>Waaxda:</strong> <p id="resDept" class="text-blue-900 font-semibold">--</p></div>
                         <div><strong>Qolka:</strong> <p id="resRoom" class="text-blue-900 font-semibold">--</p></div>
                     </div>
                 </div>
 
-                <!-- SIGNATURE SECTION (Saxiixyada Mas'uulka & Dhaqtarka) -->
+                <!-- SIGNATURE SECTION -->
                 <div class="grid grid-cols-2 gap-12 pt-8 border-t-2 border-gray-300 mt-10 text-xs">
                     <div class="text-center">
                         <div class="h-12 border-b border-dashed border-gray-400 mb-2 flex items-end justify-center">
-                            <span class="text-gray-300 italic text-[10px]">Saxiixa Dhaqtarka & Shambada</span>
+                            <span class="text-gray-400 italic text-[10px]">Saxiixa Dhaqtarka & Shambada</span>
                         </div>
                         <p class="font-bold text-gray-800">Saxiixa Dhaqtarka (Doctor Stamp)</p>
                     </div>
                     <div class="text-center">
                         <div class="h-12 border-b border-dashed border-gray-400 mb-2 flex items-end justify-center">
-                            <span class="text-gray-300 italic text-[10px]">Saxiixa Bukaanka / Mas'uulka</span>
+                            <span class="text-gray-400 italic text-[10px]">Saxiixa Bukaanka / Mas'uulka</span>
                         </div>
                         <p class="font-bold text-gray-800">Saxiixa Mas'uulka (Guardian Signature)</p>
                     </div>
@@ -342,13 +340,14 @@
         const flashEffect = document.getElementById('flashEffect');
         const camError = document.getElementById('camError');
         const liveBadge = document.getElementById('liveBadge');
+        const imageUploadInput = document.getElementById('imageUploadInput');
+        const uploadedImagePreview = document.getElementById('uploadedImagePreview');
 
         let currentStream = null;
         let facingMode = "user"; 
-        let currentFilter = "filter-iphone";
         let capturedDataUrl = null;
 
-        // Start Camera Function with Error Catching
+        // Start Camera
         async function initCamera() {
             if (currentStream) {
                 currentStream.getTracks().forEach(track => track.stop());
@@ -383,12 +382,6 @@
             }
         }
 
-        // Set Image Filter
-        function setFilter(filterClass) {
-            currentFilter = filterClass;
-            video.className = `w-full h-full object-cover transform transition-all duration-300 ${filterClass} ${facingMode === 'user' ? '-scale-x-100' : ''}`;
-        }
-
         // Auto Start Camera
         window.addEventListener('load', () => {
             initCamera();
@@ -401,7 +394,7 @@
             initCamera();
         });
 
-        // Capture Snapshot
+        // Capture Snapshot from Camera
         captureBtn.addEventListener('click', () => {
             flashEffect.classList.remove('opacity-0');
             setTimeout(() => flashEffect.classList.add('opacity-0'), 150);
@@ -419,14 +412,34 @@
             capturedDataUrl = canvas.toDataURL('image/png');
 
             canvas.classList.remove('hidden');
+            uploadedImagePreview.classList.add('hidden');
             placeholderText.classList.add('hidden');
             retakeBtn.classList.remove('hidden');
         });
 
+        // Upload Photo from Device Gallery
+        imageUploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    capturedDataUrl = e.target.result;
+                    uploadedImagePreview.src = capturedDataUrl;
+                    uploadedImagePreview.classList.remove('hidden');
+                    canvas.classList.add('hidden');
+                    placeholderText.classList.add('hidden');
+                    retakeBtn.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
         retakeBtn.addEventListener('click', () => {
             canvas.classList.add('hidden');
+            uploadedImagePreview.classList.add('hidden');
             placeholderText.classList.remove('hidden');
             retakeBtn.classList.add('hidden');
+            imageUploadInput.value = '';
             capturedDataUrl = null;
         });
 
@@ -468,16 +481,19 @@
             document.getElementById('receiptModal').classList.add('hidden');
         }
 
-        // Generate and Download PDF File
+        // Clean & High-Quality PDF Export
         function downloadPDF() {
             const element = document.getElementById('printArea');
+            
+            // Temporary styling for rendering clean PDF canvas
             const opt = {
-                margin:       0.3,
+                margin:       [0.2, 0.2, 0.2, 0.2],
                 filename:     `CABDIRAXMAN_HOSPITAL_${document.getElementById('patientName').value}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
+                image:        { type: 'jpeg', quality: 1.0 },
+                html2canvas:  { scale: 3, useCORS: true, backgroundColor: '#ffffff' },
                 jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
             };
+
             html2pdf().set(opt).from(element).save();
         }
     </script>
