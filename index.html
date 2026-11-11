@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CABDIRAXMAN HOSPITAL - Patient Registration & Professional PDF</title>
+    <title>CABDIRAXMAN HOSPITAL - Patient Registration & Live Video Recording</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,7 +16,6 @@
             #printArea { position: absolute; left: 0; top: 0; width: 100%; background: white !important; }
             .no-print { display: none !important; }
         }
-        /* PDF Specific Styling to ensure non-transparent background */
         .pdf-export-container {
             background-color: #ffffff !important;
             color: #000000 !important;
@@ -30,37 +29,30 @@
         <!-- BILINGUAL PROFESSIONAL HOSPITAL HEADER -->
         <div class="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white p-6 shadow-md border-b-4 border-amber-400">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                
-                <!-- English Name & Subtitle -->
                 <div class="text-center md:text-left">
                     <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide uppercase flex items-center justify-center md:justify-start gap-3">
                         <i class="fa-solid fa-hospital-user text-amber-400"></i> CABDIRAXMAN HOSPITAL
                     </h1>
                     <p class="text-blue-200 text-xs mt-1 font-medium tracking-wider">ADVANCED MEDICAL & RESEARCH CENTER</p>
                 </div>
-
-                <!-- Professional Emblem / Logo -->
                 <div class="flex items-center justify-center bg-white/10 backdrop-blur-md p-3 rounded-full border-2 border-amber-400/50 shadow-inner">
                     <div class="w-12 h-12 rounded-full bg-white text-blue-900 flex items-center justify-center text-2xl font-black shadow">
                         <i class="fa-solid fa-notes-medical text-blue-700"></i>
                     </div>
                 </div>
-
-                <!-- Arabic Name -->
                 <div class="text-center md:text-right" dir="rtl">
                     <h1 class="text-2xl md:text-3xl font-bold tracking-wide text-amber-300">مستشفى عبد الرحمن</h1>
                     <p class="text-blue-200 text-xs mt-1 font-medium">مركز طبي متقدم للرعاية الصحية</p>
                 </div>
-
             </div>
         </div>
 
         <form id="patientForm" class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <!-- LEFT COLUMN: CAMERA & FILE UPLOAD PHOTO -->
+            <!-- LEFT COLUMN: CAMERA & LIVE SECURITY RECORDING -->
             <div class="lg:col-span-5 flex flex-col items-center border-b lg:border-b-0 lg:border-r border-gray-200 pb-6 lg:pb-0 lg:pr-6">
                 <h2 class="text-base font-bold text-gray-800 mb-3 flex items-center justify-between w-full">
-                    <span><i class="fa-solid fa-camera text-blue-600"></i> Sawirka Bukaanka</span>
+                    <span><i class="fa-solid fa-video text-red-600"></i> Live Security Camera</span>
                     <button type="button" onclick="initCamera()" class="text-xs text-blue-600 underline"><i class="fa-solid fa-power-off"></i> Refresh Cam</button>
                 </h2>
 
@@ -68,12 +60,17 @@
                 <div class="relative w-full max-w-[340px] h-[255px] bg-gray-900 rounded-2xl overflow-hidden shadow-lg border-4 border-gray-800 flex items-center justify-center">
                     <video id="webcam" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100"></video>
                     
+                    <!-- Live Recording Status Indicator -->
                     <span id="liveBadge" class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow hidden">
-                        <span class="w-2 h-2 bg-white rounded-full animate-ping"></span> LIVE
+                        <span class="w-2 h-2 bg-white rounded-full animate-ping"></span> REC (CCTV)
                     </span>
 
-                    <!-- Fallback / Error Message if Camera fails -->
-                    <div id="camError" class="absolute inset-0 bg-gray-900 text-gray-300 p-4 flex flex-col items-center justify-center text-center gap-2">
+                    <span id="recordingTimer" class="absolute top-3 right-3 bg-black/60 text-white text-[11px] font-mono px-2 py-0.5 rounded shadow hidden">
+                        00:00
+                    </span>
+
+                    <!-- Fallback / Error Message -->
+                    <div id="camError" class="absolute inset-0 bg-gray-900 text-gray-300 p-4 flex flex-col items-center justify-center text-center gap-2 hidden">
                         <i class="fa-solid fa-video-slash text-3xl text-red-500"></i>
                         <p class="text-xs">Kamarada lama helin ama fasax ma laha.</p>
                         <button type="button" onclick="initCamera()" class="mt-2 bg-blue-600 hover:bg-blue-700 text-white text-xs py-1.5 px-3 rounded-lg font-semibold">
@@ -84,45 +81,48 @@
                     <div id="flashEffect" class="absolute inset-0 bg-white opacity-0 transition-opacity duration-150 pointer-events-none"></div>
                 </div>
 
-                <!-- Camera & Upload Controls -->
-                <div class="flex gap-2 mt-4 w-full max-w-[340px]">
-                    <button type="button" id="switchCamBtn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 px-2 rounded-xl text-xs font-semibold border transition flex items-center justify-center gap-1 shadow-sm">
-                        <i class="fa-solid fa-rotate"></i> Badal Cam
+                <!-- Camera & Recording Controls -->
+                <div class="grid grid-cols-2 gap-2 mt-4 w-full max-w-[340px]">
+                    <button type="button" id="toggleRecBtn" class="bg-red-600 hover:bg-red-700 text-white py-2.5 px-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md active:scale-95">
+                        <i class="fa-solid fa-stop-circle" id="recIcon"></i> <span id="recBtnText">Jooji Duubista</span>
                     </button>
-                    <button type="button" id="captureBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-md active:scale-95">
-                        <i class="fa-solid fa-circle-dot text-red-400"></i> Qaad Sawir
+                    <button type="button" id="captureBtn" class="bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-md active:scale-95">
+                        <i class="fa-solid fa-camera"></i> Qaad Sawir
                     </button>
                 </div>
 
-                <!-- NEW: UPLOAD PHOTO FROM DEVICE -->
-                <div class="w-full max-w-[340px] mt-3">
-                    <label class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold py-2.5 px-3 rounded-xl text-xs border border-emerald-300 transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
-                        <i class="fa-solid fa-upload text-emerald-600"></i> Sawir Ka Soo Gali Telefoonka / Gallery
+                <!-- Upload Photo Option -->
+                <div class="w-full max-w-[340px] mt-2">
+                    <label class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold py-2 px-3 rounded-xl text-xs border border-emerald-300 transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                        <i class="fa-solid fa-upload text-emerald-600"></i> Sawir Ka Soo Gali Gallery-ga
                         <input type="file" id="imageUploadInput" accept="image/*" class="hidden">
                     </label>
                 </div>
 
-                <!-- Photo Preview Canvas -->
-                <div class="mt-5 w-full max-w-[340px]">
+                <!-- Recorded Video Player / Snapshot Preview -->
+                <div class="mt-4 w-full max-w-[340px]">
                     <div class="flex justify-between items-center mb-1.5">
-                        <label class="text-xs font-semibold text-gray-600">Sawirka Diyaar Ah:</label>
-                        <button type="button" id="retakeBtn" class="text-xs text-blue-600 hover:underline hidden font-medium"><i class="fa-solid fa-arrows-rotate"></i> Dib u dooro / qaad</button>
+                        <label class="text-xs font-semibold text-gray-600">Muuqaalka / Sawirka Diyaar-ka ah:</label>
+                        <button type="button" id="retakeBtn" class="text-xs text-blue-600 hover:underline hidden font-medium"><i class="fa-solid fa-arrows-rotate"></i> Dib u dooro</button>
                     </div>
                     <div class="w-full h-[200px] bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative shadow-inner">
                         <canvas id="canvas" class="hidden w-full h-full object-cover"></canvas>
                         <img id="uploadedImagePreview" class="hidden w-full h-full object-cover" alt="Uploaded Preview">
+                        <video id="recordedPlayback" controls class="hidden w-full h-full object-cover"></video>
                         <p id="placeholderText" class="text-gray-400 text-xs text-center px-4">
-                            <i class="fa-regular fa-image text-2xl mb-1 block"></i>
-                            Sawir qaad ama ka soo gali gallery-ga.
+                            <i class="fa-solid fa-circle-play text-2xl mb-1 block"></i>
+                            Muuqaalka duuban ama sawirka halkan uu ka soo muuqan doonaa.
                         </p>
                     </div>
+                    <a id="downloadVideoBtn" download="cctv_recording.webm" class="hidden mt-2 text-xs w-full bg-indigo-600 text-white py-2 rounded-xl font-bold flex items-center justify-center gap-1 hover:bg-indigo-700 shadow">
+                        <i class="fa-solid fa-download"></i> Soo Dejiso Muuqaalka Duuban
+                    </a>
                 </div>
             </div>
 
             <!-- RIGHT COLUMN: DETAILED FORM DATA -->
             <div class="lg:col-span-7 flex flex-col gap-6">
-                
-                <!-- 1. Xogta Bukaanka -->
+                <!-- 1. Patient Info -->
                 <div class="bg-slate-50/80 p-4 rounded-xl border border-slate-200">
                     <h3 class="text-sm font-bold text-gray-800 border-b pb-2 mb-3 flex items-center gap-2">
                         <i class="fa-solid fa-user text-blue-600"></i> 1. Xogta Bukaanka (Patient Info)
@@ -154,7 +154,7 @@
                     </div>
                 </div>
 
-                <!-- 2. Xogta Waalidiinta & Mas'uulka -->
+                <!-- 2. Parents & Guardian -->
                 <div class="bg-slate-50/80 p-4 rounded-xl border border-slate-200">
                     <h3 class="text-sm font-bold text-gray-800 border-b pb-2 mb-3 flex items-center gap-2">
                         <i class="fa-solid fa-users text-indigo-600"></i> 2. Xogta Waalidiinta & Mas'uulka
@@ -190,14 +190,14 @@
                     </div>
                 </div>
 
-                <!-- 3. Xogta Dhaqtarka (Gacanta Lagu Qorayo) -->
+                <!-- 3. Doctor Info -->
                 <div class="bg-slate-50/80 p-4 rounded-xl border border-slate-200">
                     <h3 class="text-sm font-bold text-gray-800 border-b pb-2 mb-3 flex items-center gap-2">
                         <i class="fa-solid fa-user-doctor text-emerald-600"></i> 3. Xogta Dhaqtarka & Waaxda
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700 mb-1">Magaca Dhaqtarka (Gacanta ku qor) *</label>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Magaca Dhaqtarka *</label>
                             <input type="text" id="doctorName" required placeholder="Dr. Cabdiraxmaan Maxamed" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
                         </div>
                         <div>
@@ -219,22 +219,16 @@
                 <button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-xl transition flex items-center justify-center gap-2 text-base">
                     <i class="fa-solid fa-file-invoice text-lg"></i> Keydi & Soo Saar Warqada Bukaanka (Document)
                 </button>
-
             </div>
         </form>
     </div>
 
-    <!-- PROFESSIONAL A4 DOCUMENT / PRINT PREVIEW MODAL -->
+    <!-- DOCUMENT / PRINT PREVIEW MODAL -->
     <div id="receiptModal" class="fixed inset-0 bg-black/70 backdrop-blur-md hidden flex items-center justify-center p-2 md:p-6 z-50 overflow-y-auto">
         <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full my-8 p-6 md:p-10 relative border border-gray-300">
-            
-            <!-- Close Button -->
             <button onclick="closeModal()" class="no-print absolute top-4 right-4 bg-gray-100 hover:bg-gray-200 text-gray-700 w-8 h-8 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-xmark"></i></button>
 
-            <!-- PRINTABLE DOCUMENT AREA (ENFORCED WHITE BACKGROUND) -->
             <div id="printArea" class="p-4 bg-white pdf-export-container rounded-lg">
-                
-                <!-- DOCUMENT HEADER -->
                 <div class="border-b-4 border-blue-900 pb-4 mb-6 flex justify-between items-center bg-white">
                     <div>
                         <h1 class="text-2xl font-black text-blue-900 tracking-wider">CABDIRAXMAN HOSPITAL</h1>
@@ -253,13 +247,11 @@
                     <span class="bg-blue-900 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">Official Registration Document</span>
                 </div>
 
-                <!-- TICKET / DATE INFO -->
                 <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-200 text-xs mb-6">
                     <div><strong class="text-gray-800">REGISTRATION ID:</strong> <span id="resTicketId" class="text-blue-800 font-bold">#CRH-8923</span></div>
                     <div><strong class="text-gray-800">TAARIIKH:</strong> <span id="resDate" class="text-gray-800">--</span></div>
                 </div>
 
-                <!-- PATIENT OVERVIEW -->
                 <div class="flex items-start gap-6 bg-slate-50 p-4 rounded-xl border border-gray-200 mb-6">
                     <div class="w-28 h-28 rounded-xl bg-gray-200 overflow-hidden border-2 border-blue-800 flex-shrink-0 shadow">
                         <img id="resPhoto" src="" alt="Patient Photo" class="w-full h-full object-cover">
@@ -274,7 +266,6 @@
                     </div>
                 </div>
 
-                <!-- PARENTS & GUARDIAN DETAILS -->
                 <div class="mb-6">
                     <h4 class="text-xs font-bold uppercase text-gray-700 border-b border-gray-200 pb-1 mb-2">Xogta Waalidiinta & Mas'uulka</h4>
                     <div class="grid grid-cols-3 gap-3 text-xs bg-gray-50 p-3 rounded-lg border border-gray-200 text-gray-800">
@@ -284,7 +275,6 @@
                     </div>
                 </div>
 
-                <!-- DOCTOR & DEPARTMENT DETAILS -->
                 <div class="mb-8">
                     <h4 class="text-xs font-bold uppercase text-gray-700 border-b border-gray-200 pb-1 mb-2">Xogta Dhaqtarka & Waaxda</h4>
                     <div class="grid grid-cols-3 gap-3 text-xs bg-blue-50/60 p-3 rounded-lg border border-blue-100 text-gray-800">
@@ -294,7 +284,6 @@
                     </div>
                 </div>
 
-                <!-- SIGNATURE SECTION -->
                 <div class="grid grid-cols-2 gap-12 pt-8 border-t-2 border-gray-300 mt-10 text-xs">
                     <div class="text-center">
                         <div class="h-12 border-b border-dashed border-gray-400 mb-2 flex items-end justify-center">
@@ -309,10 +298,8 @@
                         <p class="font-bold text-gray-800">Saxiixa Mas'uulka (Guardian Signature)</p>
                     </div>
                 </div>
-
             </div>
 
-            <!-- MODAL CONTROL BUTTONS -->
             <div class="no-print flex flex-col md:flex-row gap-3 mt-8 border-t pt-4">
                 <button onclick="downloadPDF()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow transition flex items-center justify-center gap-2 text-sm">
                     <i class="fa-solid fa-file-pdf"></i> Soo Degso PDF (Download PDF)
@@ -324,16 +311,14 @@
                     Xir
                 </button>
             </div>
-
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT & MEDIA RECORDER ENGINE -->
     <script>
         const video = document.getElementById('webcam');
         const canvas = document.getElementById('canvas');
         const captureBtn = document.getElementById('captureBtn');
-        const switchCamBtn = document.getElementById('switchCamBtn');
         const placeholderText = document.getElementById('placeholderText');
         const retakeBtn = document.getElementById('retakeBtn');
         const patientForm = document.getElementById('patientForm');
@@ -343,58 +328,146 @@
         const imageUploadInput = document.getElementById('imageUploadInput');
         const uploadedImagePreview = document.getElementById('uploadedImagePreview');
 
-        let currentStream = null;
-        let facingMode = "user"; 
-        let capturedDataUrl = null;
+        // Recording Specific Elements
+        const toggleRecBtn = document.getElementById('toggleRecBtn');
+        const recIcon = document.getElementById('recIcon');
+        const recBtnText = document.getElementById('recBtnText');
+        const recordingTimer = document.getElementById('recordingTimer');
+        const recordedPlayback = document.getElementById('recordedPlayback');
+        const downloadVideoBtn = document.getElementById('downloadVideoBtn');
 
-        // Start Camera
+        let currentStream = null;
+        let capturedDataUrl = null;
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let isRecording = false;
+        let timerInterval = null;
+        let recordSeconds = 0;
+
+        // Initialize Live Camera & Automatic CCTV Video Recording
         async function initCamera() {
             if (currentStream) {
                 currentStream.getTracks().forEach(track => track.stop());
             }
 
             const constraints = {
-                video: {
-                    facingMode: facingMode,
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                },
-                audio: false
+                video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" },
+                audio: true
             };
 
             try {
                 currentStream = await navigator.mediaDevices.getUserMedia(constraints);
                 video.srcObject = currentStream;
                 await video.play();
-                
+
                 camError.classList.add('hidden');
                 liveBadge.classList.remove('hidden');
 
-                if (facingMode === 'user') {
-                    video.classList.add('-scale-x-100');
-                } else {
-                    video.classList.remove('-scale-x-100');
-                }
+                // Start automatic live security recording
+                startRecording();
             } catch (err) {
-                console.error("Camera Error:", err);
+                console.error("Camera Access Error:", err);
                 camError.classList.remove('hidden');
                 liveBadge.classList.add('hidden');
             }
         }
 
-        // Auto Start Camera
+        // Start Video Recording (MediaRecorder API)
+        function startRecording() {
+            if (!currentStream) return;
+
+            recordedChunks = [];
+            try {
+                const options = { mimeType: 'video/webm;codecs=vp9,opus' };
+                mediaRecorder = new MediaRecorder(currentStream, MediaRecorder.isTypeSupported(options.mimeType) ? options : {});
+            } catch (e) {
+                mediaRecorder = new MediaRecorder(currentStream);
+            }
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data && event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const videoURL = URL.createObjectURL(blob);
+                recordedPlayback.src = videoURL;
+                downloadVideoBtn.href = videoURL;
+
+                recordedPlayback.classList.remove('hidden');
+                canvas.classList.add('hidden');
+                uploadedImagePreview.classList.add('hidden');
+                placeholderText.classList.add('hidden');
+                downloadVideoBtn.classList.remove('hidden');
+                retakeBtn.classList.remove('hidden');
+            };
+
+            mediaRecorder.start(1000); // Collect data every second
+            isRecording = true;
+            updateRecUI(true);
+            startTimer();
+        }
+
+        // Stop Video Recording
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                updateRecUI(false);
+                stopTimer();
+            }
+        }
+
+        // Toggle Recording Button Action
+        toggleRecBtn.addEventListener('click', () => {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        });
+
+        function updateRecUI(recording) {
+            if (recording) {
+                recIcon.className = "fa-solid fa-stop-circle";
+                recBtnText.innerText = "Jooji Duubista";
+                toggleRecBtn.className = "bg-red-600 hover:bg-red-700 text-white py-2.5 px-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md active:scale-95";
+                liveBadge.classList.remove('hidden');
+                recordingTimer.classList.remove('hidden');
+            } else {
+                recIcon.className = "fa-solid fa-circle-play";
+                recBtnText.innerText = "Billaaw Duubis";
+                toggleRecBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 px-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md active:scale-95";
+                liveBadge.classList.add('hidden');
+            }
+        }
+
+        // Timer Logic
+        function startTimer() {
+            recordSeconds = 0;
+            recordingTimer.innerText = "00:00";
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                recordSeconds++;
+                const mins = String(Math.floor(recordSeconds / 60)).padStart(2, '0');
+                const secs = String(recordSeconds % 60).padStart(2, '0');
+                recordingTimer.innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        // Auto Start Camera on Page Load
         window.addEventListener('load', () => {
             initCamera();
             document.getElementById('appointDate').valueAsDate = new Date();
         });
 
-        // Switch Camera (Front / Back)
-        switchCamBtn.addEventListener('click', () => {
-            facingMode = facingMode === "user" ? "environment" : "user";
-            initCamera();
-        });
-
-        // Capture Snapshot from Camera
+        // Capture Snapshot from Live Video
         captureBtn.addEventListener('click', () => {
             flashEffect.classList.remove('opacity-0');
             setTimeout(() => flashEffect.classList.add('opacity-0'), 150);
@@ -403,15 +476,14 @@
             canvas.width = 400;
             canvas.height = 300;
 
-            if (facingMode === 'user') {
-                context.translate(canvas.width, 0);
-                context.scale(-1, 1);
-            }
-
+            context.translate(canvas.width, 0);
+            context.scale(-1, 1);
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             capturedDataUrl = canvas.toDataURL('image/png');
 
             canvas.classList.remove('hidden');
+            recordedPlayback.classList.add('hidden');
+            downloadVideoBtn.classList.add('hidden');
             uploadedImagePreview.classList.add('hidden');
             placeholderText.classList.add('hidden');
             retakeBtn.classList.remove('hidden');
@@ -427,6 +499,8 @@
                     uploadedImagePreview.src = capturedDataUrl;
                     uploadedImagePreview.classList.remove('hidden');
                     canvas.classList.add('hidden');
+                    recordedPlayback.classList.add('hidden');
+                    downloadVideoBtn.classList.add('hidden');
                     placeholderText.classList.add('hidden');
                     retakeBtn.classList.remove('hidden');
                 };
@@ -437,28 +511,27 @@
         retakeBtn.addEventListener('click', () => {
             canvas.classList.add('hidden');
             uploadedImagePreview.classList.add('hidden');
+            recordedPlayback.classList.add('hidden');
+            downloadVideoBtn.classList.add('hidden');
             placeholderText.classList.remove('hidden');
             retakeBtn.classList.add('hidden');
             imageUploadInput.value = '';
             capturedDataUrl = null;
         });
 
-        // Form Submit
+        // Form Submit Logic
         patientForm.addEventListener('submit', (e) => {
             e.preventDefault();
 
-            // Populate Document Data
             document.getElementById('resName').innerText = document.getElementById('patientName').value;
             document.getElementById('resPhone').innerText = document.getElementById('patientPhone').value;
             document.getElementById('resAgeGender').innerText = `${document.getElementById('patientAge').value} Sano | ${document.getElementById('patientGender').value}`;
             document.getElementById('resAddress').innerText = document.getElementById('patientAddress').value || "Mogadishu, Somalia";
             
-            // Doctor & Department
             document.getElementById('resDoctor').innerText = document.getElementById('doctorName').value;
             document.getElementById('resDept').innerText = document.getElementById('doctorDept').value;
             document.getElementById('resRoom').innerText = document.getElementById('doctorRoom').value || "Room 01";
 
-            // Parents & Guardian
             document.getElementById('resFather').innerText = `${document.getElementById('fatherName').value || 'N/A'} (${document.getElementById('fatherPhone').value || '-'})`;
             document.getElementById('resMother').innerText = `${document.getElementById('motherName').value || 'N/A'} (${document.getElementById('motherPhone').value || '-'})`;
             
@@ -466,14 +539,10 @@
             const gTel = document.getElementById('guardianPhone').value;
             document.getElementById('resGuardian').innerText = gName ? `${gName} (${gTel || '-'})` : 'N/A';
 
-            // Photo
             document.getElementById('resPhoto').src = capturedDataUrl || 'https://via.placeholder.com/150?text=No+Photo';
-            
-            // Date & Ticket ID
             document.getElementById('resTicketId').innerText = "#CRH-" + Math.floor(100000 + Math.random() * 900000);
             document.getElementById('resDate').innerText = new Date().toLocaleDateString('so-SO');
 
-            // Open Document Modal
             document.getElementById('receiptModal').classList.remove('hidden');
         });
 
@@ -481,11 +550,9 @@
             document.getElementById('receiptModal').classList.add('hidden');
         }
 
-        // Clean & High-Quality PDF Export
+        // Export PDF
         function downloadPDF() {
             const element = document.getElementById('printArea');
-            
-            // Temporary styling for rendering clean PDF canvas
             const opt = {
                 margin:       [0.2, 0.2, 0.2, 0.2],
                 filename:     `CABDIRAXMAN_HOSPITAL_${document.getElementById('patientName').value}.pdf`,
@@ -493,7 +560,6 @@
                 html2canvas:  { scale: 3, useCORS: true, backgroundColor: '#ffffff' },
                 jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
             };
-
             html2pdf().set(opt).from(element).save();
         }
     </script>
